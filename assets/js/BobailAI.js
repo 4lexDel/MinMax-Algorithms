@@ -7,6 +7,6 @@ class BobailAI {
 
     getNextState(state) {
         //return state;
-        return this.algo.execute(state, 4).state;
+        return this.algo.execute(state, 3).state;
     }
 }

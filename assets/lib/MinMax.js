@@ -37,27 +37,27 @@ class MinMax {
 
     minMax(state, depth, alpha, beta, maximizingPlayer) {
         // Recherche dans la table de transposition
-        const transpositionEntry = this.transpositionTable.get(state);
-        if (transpositionEntry && transpositionEntry.depth >= depth) {
-            if (transpositionEntry.type === "exact") {
-                return transpositionEntry.evaluation;
-            }
-            if (transpositionEntry.type === "lowerbound") {
-                alpha = Math.max(alpha, transpositionEntry.evaluation);
-            }
-            if (transpositionEntry.type === "upperbound") {
-                beta = Math.min(beta, transpositionEntry.evaluation);
-            }
-            if (alpha >= beta) {
-                return transpositionEntry.evaluation;
-            }
-        }
+        // const transpositionEntry = this.transpositionTable.get(state);
+        // if (transpositionEntry && transpositionEntry.depth >= depth) {
+        //     if (transpositionEntry.type === "exact") {
+        //         return transpositionEntry.evaluation;
+        //     }
+        //     if (transpositionEntry.type === "lowerbound") {
+        //         alpha = Math.max(alpha, transpositionEntry.evaluation);
+        //     }
+        //     if (transpositionEntry.type === "upperbound") {
+        //         beta = Math.min(beta, transpositionEntry.evaluation);
+        //     }
+        //     if (alpha >= beta) {
+        //         return transpositionEntry.evaluation;
+        //     }
+        // }
 
         if (depth === 0 || this.implementation.isGameOver(state)) {
             this.nbNodeEvaluate++;
             const evaluation = this.implementation.evaluateState(state);
             // Enregistrement de l'évaluation dans la table de transposition
-            this.transpositionTable.set(state, { evaluation, type: "exact", depth });
+            // this.transpositionTable.set(state, { evaluation, type: "exact", depth });
             return evaluation;
         }
 
@@ -68,7 +68,7 @@ class MinMax {
             const children = this.implementation.generateChildren(state, true);
             for (const childState of children) {
                 const evalChild = this.minMax(childState, depth - 1, alpha, beta, false);
-                if (evalChild >= maxEval) {
+                if (evalChild > maxEval) {
                     maxEval = evalChild;
                     bestChild = childState;
                 }
@@ -81,7 +81,7 @@ class MinMax {
             if (depth == this.depthMax) return { evaluation: maxEval, state: bestChild };
 
             // Enregistrement de l'évaluation dans la table de transposition
-            this.transpositionTable.set(state, { evaluation: maxEval, type: "lowerbound", depth });
+            // this.transpositionTable.set(state, { evaluation: maxEval, type: "lowerbound", depth });
             return maxEval;
         } else {
             let minEval = Number.POSITIVE_INFINITY;
@@ -90,7 +90,7 @@ class MinMax {
             const children = this.implementation.generateChildren(state, false);
             for (const childState of children) {
                 const evalChild = this.minMax(childState, depth - 1, alpha, beta, true);
-                if (evalChild <= minEval) {
+                if (evalChild < minEval) {
                     minEval = evalChild;
                     bestChild = childState;
                 }
@@ -103,7 +103,7 @@ class MinMax {
             if (depth == this.depthMax) return { evaluation: minEval, state: bestChild };
 
             // Enregistrement de l'évaluation dans la table de transposition
-            this.transpositionTable.set(state, { evaluation: minEval, type: "upperbound", depth });
+            // this.transpositionTable.set(state, { evaluation: minEval, type: "upperbound", depth });
             return minEval;
         }
     }
