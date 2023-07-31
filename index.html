@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpion - Tic Tac Toe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="board" width="300" height="300"></canvas>
+    <script src="assets/lib/Interface.js"></script>
+    <script src="assets/lib/MinMax.js"></script>
+    <script src="assets/js/MorpionImplementation.js"></script>
+    <script src="assets/js/index.js"></script>
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        const cellSize = 100;
+        let state = [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 0, 0]
+        ];
+        let currentPlayer = 2;
+        let gameOver = false;
+
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const cellValue = state[i][j];
+                    ctx.beginPath();
+                    ctx.rect(j * cellSize, i * cellSize, cellSize, cellSize);
+                    ctx.fillStyle = cellValue === 1 ? 'blue' : cellValue === 2 ? 'red' : 'white';
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+        }
+
+        function checkWinner() {
+            // Check rows, columns, and diagonals for a winner
+            for (let i = 0; i < 3; i++) {
+                if (state[i][0] !== 0 && state[i][0] === state[i][1] && state[i][1] === state[i][2]) {
+                    return state[i][0];
+                }
+                if (state[0][i] !== 0 && state[0][i] === state[1][i] && state[1][i] === state[2][i]) {
+                    return state[0][i];
+                }
+            }
+
+            if (state[0][0] !== 0 && state[0][0] === state[1][1] && state[1][1] === state[2][2]) {
+                return state[0][0];
+            }
+
+            if (state[0][2] !== 0 && state[0][2] === state[1][1] && state[1][1] === state[2][0]) {
+                return state[0][2];
+            }
+
+            // Check if the board is full (draw)
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (state[i][j] === 0) {
+                        return 0; // Game ongoing
+                    }
+                }
+            }
+
+            return -1; // Draw
+        }
+
+        function handleMove(x, y) {
+            if (gameOver) {
+                return; // Ne rien faire si le jeu est terminé
+            }
+
+            const row = Math.floor(y / cellSize);
+            const col = Math.floor(x / cellSize);
+
+            if (state[row][col] === 0) {
+                state[row][col] = currentPlayer;
+                //currentPlayer = 3 - currentPlayer; // Switch player (1 to 2, or 2 to 1)
+                drawBoard();
+
+                let winner = checkWinner();
+                if (winner == 0) {
+                    state = getNextMove(state); //IA---------------------
+
+                    drawBoard();
+
+                    checkWinner();
+                }
+            }
+        }
+
+        function displayWinner(winner) {
+            if (winner !== 0) {
+                setTimeout(() => {
+                    if (winner === -1) {
+                        alert("It's a draw!");
+                    } else {
+                        alert(`Player ${winner} wins!`);
+                    }
+                    //gameOver = true; // Définir gameOver à true pour indiquer que le jeu est terminé
+
+                    setTimeout(() => {
+                        resetGame();
+                    }, 1000);
+                }, 1000);
+            }
+        }
+
+        function resetGame() {
+            state = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ];
+            currentPlayer = 1;
+            gameOver = false; // Remettre gameOver à false pour permettre aux joueurs de jouer à nouveau
+            drawBoard();
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            handleMove(x, y);
+        });
+
+        drawBoard();
+    </script>
+</body>
+
+</html>
