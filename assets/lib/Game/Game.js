@@ -13,7 +13,7 @@ class Game extends GameBase { //A renommer ?
 
         this.playerToPlay = 1;
 
-        this.ai = new BobailAI(3);
+        this.ai = new BobailAI();
 
         let gridTest = [
             [1, 3, 2, 0, 0],
@@ -21,9 +21,18 @@ class Game extends GameBase { //A renommer ?
             [1, 0, 0, 0, 0],
             [1, 0, 0, 0, 2],
             [0, 0, 0, 0, 1]
-        ]
+        ];
 
-        console.log("EVA TEST : " + this.ai.evaluateState(gridTest, 2));
+        let gridTest2 = [
+            [1, 0, 0, 0, 2],
+            [1, 0, 0, 0, 2],
+            [1, 0, 3, 0, 2],
+            [1, 0, 0, 0, 2],
+            [1, 0, 0, 0, 2]
+        ];
+
+        console.log("EVA TEST : " + this.ai.algo.implementation.evaluateState(gridTest, false));
+        console.log(this.ai.algo.implementation.generateChildren(gridTest2, false));
 
         /*--------------------------------*/
 
@@ -147,7 +156,7 @@ class Game extends GameBase { //A renommer ?
                     this.mapPlayer.grid = this.game.grid;
                     this.playerToPlay = 2; //si move possible alors on joue plus (nécessaire car programmation evenement)
 
-                    let result = this.ai.getNextState(this.game.grid, 2);
+                    let result = this.ai.getNextState(this.game.grid);
 
                     this.game.grid = result;
                     this.game.switchPlayer();

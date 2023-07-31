@@ -28,7 +28,7 @@ class MinMax {
     execute(state, depth) {
         this.depthMax = depth;
 
-        let result = this.minMax(state, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true);
+        let result = this.minMax(state, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false);
         console.log('Nb node explore : ' + this.nbNodeEvaluate);
         console.log('Nb pruning : ' + this.nbPrunning);
         console.log('Final evaluation : ' + result.evaluation);
