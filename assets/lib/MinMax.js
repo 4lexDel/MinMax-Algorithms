@@ -16,13 +16,12 @@ class MinMax {
         Interface.checkImplements(implementation, MinMax.MinMaxInterface);
         this.implementation = implementation;
 
-        // this.dataTest = [10, 11, 9, 12, 14, 15, 13, 14, 5, 2, 4, 1, 3, 22, 20, 21]
-        // this.indexDataTest = 0;
-
         this.nbNodeEvaluate = 0;
         this.nbPrunning = 0;
-
         this.pruningActive = true;
+
+        // Table de transposition (un objet Map en JavaScript)
+        this.transpositionTable = new Map();
     }
 
     execute(state, depth) {
@@ -37,13 +36,29 @@ class MinMax {
     }
 
     minMax(state, depth, alpha, beta, maximizingPlayer) {
+        // Recherche dans la table de transposition
+        const transpositionEntry = this.transpositionTable.get(state);
+        if (transpositionEntry && transpositionEntry.depth >= depth) {
+            if (transpositionEntry.type === "exact") {
+                return transpositionEntry.evaluation;
+            }
+            if (transpositionEntry.type === "lowerbound") {
+                alpha = Math.max(alpha, transpositionEntry.evaluation);
+            }
+            if (transpositionEntry.type === "upperbound") {
+                beta = Math.min(beta, transpositionEntry.evaluation);
+            }
+            if (alpha >= beta) {
+                return transpositionEntry.evaluation;
+            }
+        }
+
         if (depth === 0 || this.implementation.isGameOver(state)) {
-            // console.log("------------" + depth + "-------------");
-            // console.log(this.evaluate(state));
-            // console.log(state);
-            // console.log("-------------------------");
             this.nbNodeEvaluate++;
-            return this.implementation.evaluateState(state);
+            const evaluation = this.implementation.evaluateState(state);
+            // Enregistrement de l'évaluation dans la table de transposition
+            this.transpositionTable.set(state, { evaluation, type: "exact", depth });
+            return evaluation;
         }
 
         if (maximizingPlayer) {
@@ -64,6 +79,9 @@ class MinMax {
                 }
             }
             if (depth == this.depthMax) return { evaluation: maxEval, state: bestChild };
+
+            // Enregistrement de l'évaluation dans la table de transposition
+            this.transpositionTable.set(state, { evaluation: maxEval, type: "lowerbound", depth });
             return maxEval;
         } else {
             let minEval = Number.POSITIVE_INFINITY;
@@ -83,15 +101,18 @@ class MinMax {
                 }
             }
             if (depth == this.depthMax) return { evaluation: minEval, state: bestChild };
+
+            // Enregistrement de l'évaluation dans la table de transposition
+            this.transpositionTable.set(state, { evaluation: minEval, type: "upperbound", depth });
             return minEval;
         }
     }
 
     pruningAction(depth) {
-        // this.indexDataTest += 2 ** depth - 1;
         this.nbPrunning++;
     }
 }
+
 
 
 /**
