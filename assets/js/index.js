@@ -4,7 +4,7 @@
 //     [0, 0, 0],
 // ]
 
-let implementation = new MorpionImplementation();
+let implementation = new Puissance4Implementation();
 
 
 algo = new MinMax(implementation);
@@ -15,5 +15,8 @@ algo = new MinMax(implementation);
 
 // console.log(generateChildren(state).length);
 function getNextMove(state) {
-    return algo.execute(state, 100).state;
+    console.log(implementation.evaluateState(state));
+    console.log(implementation.generateChildren(state, false));
+    // return state;
+    return algo.execute(state, 7).state;
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function getCoupsPossibles(grille) {
+            const coupsPossibles = [];
+            const hauteur = grille.length;
+            const largeur = grille[0].length;
+
+            // Vérifie si la colonne est valide pour insérer un jeton
+            function estColonneValide(colonne) {
+                return colonne >= 0 && colonne < largeur && grille[0][colonne] === null;
+            }
+
+            // Copie la grille pour éviter les effets de bord lors des modifications
+            function copierGrille(grille) {
+                return grille.map((ligne) => [...ligne]);
+            }
+
+            for (let colonne = 0; colonne < largeur; colonne++) {
+                if (estColonneValide(colonne)) {
+                    // Trouver la ligne vide où insérer le jeton
+                    let ligne = hauteur - 1;
+                    while (ligne >= 0 && grille[ligne][colonne] !== null) {
+                        ligne--;
+                    }
+
+                    if (ligne >= 0) {
+                        // Effectuer le coup en copiant la grille et en insérant le jeton
+                        const nouvelleGrille = copierGrille(grille);
+                        nouvelleGrille[ligne][colonne] = 'X'; // Vous pouvez utiliser 'O' pour le joueur 2 si nécessaire
+
+                        coupsPossibles.push(nouvelleGrille);
+                    }
+                }
+            }
+
+            return coupsPossibles;
+        }
+
+        // Exemple d'utilisation avec une grille de jeu
+        const grilleJeu = [
+            ['X', 'O', 'O', null, null, 'X', 'O'],
+            ['X', 'X', 'O', 'O', null, 'X', 'O'],
+            ['O', 'O', 'X', 'X', 'O', 'X', 'O'],
+            ['X', 'X', 'O', 'O', 'X', 'O', 'X'],
+            ['O', 'O', 'X', 'X', 'X', 'O', 'X'],
+            ['X', 'O', 'X', 'O', 'O', 'X', 'O'],
+        ];
+
+        const coupsPossibles = getCoupsPossibles(grilleJeu);
+        console.log(coupsPossibles);
+    </script>
+</body>
+
+</html>

@@ -1,150 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morpion - Tic Tac Toe</title>
+    <title>Puissance 4</title>
     <style>
         body {
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
         
         canvas {
-            border: 2px solid black;
+            border: 1px solid black;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="board" width="300" height="300"></canvas>
+    <canvas id="gameCanvas" width="420" height="360"></canvas>
+
     <script src="assets/lib/Interface.js"></script>
     <script src="assets/lib/MinMax.js"></script>
-    <script src="assets/js/MorpionImplementation.js"></script>
+    <script src="assets/js/Puissance4Implementation.js"></script>
     <script src="assets/js/index.js"></script>
-    <script>
-        const canvas = document.getElementById('board');
-        const ctx = canvas.getContext('2d');
-        const cellSize = 100;
-        let state = [
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0]
-        ];
-        let currentPlayer = 2;
-        let gameOver = false;
 
-        function drawBoard() {
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const GRID_SIZE = 60;
+        const COLS = 7;
+        const ROWS = 6;
+        const PLAYER1_COLOR = "red";
+        const PLAYER2_COLOR = "blue";
+
+        let currentPlayer = 1;
+        let grid = [];
+
+        // Initialisation de la grille vide
+        function initializeGrid() {
+            for (let row = 0; row < ROWS; row++) {
+                grid[row] = [];
+                for (let col = 0; col < COLS; col++) {
+                    grid[row][col] = 0;
+                }
+            }
+        }
+
+        // Dessine la grille et les pièces
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    const cellValue = state[i][j];
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    drawPiece(col, row, grid[row][col]);
+                }
+            }
+
+            drawGrid();
+        }
+
+        // Dessine une pièce à une position donnée
+        function drawPiece(col, row, player) {
+            const x = col * GRID_SIZE + GRID_SIZE / 2;
+            const y = canvas.height - ((ROWS - 1 - row) * GRID_SIZE + GRID_SIZE / 2);
+            const radius = GRID_SIZE / 2 - 5;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+            switch (player) {
+                case 1:
+                    ctx.fillStyle = PLAYER1_COLOR;
+                    break;
+
+                case 2:
+                    ctx.fillStyle = PLAYER2_COLOR;
+                    break;
+
+                default:
+                    ctx.fillStyle = "grey";
+                    break;
+            }
+
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Dessine la grille
+        function drawGrid() {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
                     ctx.beginPath();
-                    ctx.rect(j * cellSize, i * cellSize, cellSize, cellSize);
-                    ctx.fillStyle = cellValue === 1 ? 'blue' : cellValue === 2 ? 'red' : 'white';
-                    ctx.fill();
+                    ctx.rect(col * GRID_SIZE, canvas.height - (row * GRID_SIZE) - GRID_SIZE, GRID_SIZE, GRID_SIZE);
+                    ctx.strokeStyle = "black";
                     ctx.stroke();
                     ctx.closePath();
                 }
             }
         }
 
-        function checkWinner() {
-            // Check rows, columns, and diagonals for a winner
-            for (let i = 0; i < 3; i++) {
-                if (state[i][0] !== 0 && state[i][0] === state[i][1] && state[i][1] === state[i][2]) {
-                    return state[i][0];
-                }
-                if (state[0][i] !== 0 && state[0][i] === state[1][i] && state[1][i] === state[2][i]) {
-                    return state[0][i];
-                }
-            }
-
-            if (state[0][0] !== 0 && state[0][0] === state[1][1] && state[1][1] === state[2][2]) {
-                return state[0][0];
-            }
-
-            if (state[0][2] !== 0 && state[0][2] === state[1][1] && state[1][1] === state[2][0]) {
-                return state[0][2];
-            }
-
-            // Check if the board is full (draw)
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    if (state[i][j] === 0) {
-                        return 0; // Game ongoing
-                    }
-                }
-            }
-
-            return -1; // Draw
-        }
-
-        function handleMove(x, y) {
-            if (gameOver) {
-                return; // Ne rien faire si le jeu est terminé
-            }
-
-            const row = Math.floor(y / cellSize);
-            const col = Math.floor(x / cellSize);
-
-            if (state[row][col] === 0) {
-                state[row][col] = currentPlayer;
-                //currentPlayer = 3 - currentPlayer; // Switch player (1 to 2, or 2 to 1)
-                drawBoard();
-
-                let winner = checkWinner();
-                if (winner == 0) {
-                    state = getNextMove(state); //IA---------------------
-
-                    drawBoard();
-
-                    checkWinner();
-                }
-            }
-        }
-
-        function displayWinner(winner) {
-            if (winner !== 0) {
-                setTimeout(() => {
-                    if (winner === -1) {
-                        alert("It's a draw!");
-                    } else {
-                        alert(`Player ${winner} wins!`);
-                    }
-                    //gameOver = true; // Définir gameOver à true pour indiquer que le jeu est terminé
-
-                    setTimeout(() => {
-                        resetGame();
-                    }, 1000);
-                }, 1000);
-            }
-        }
-
-        function resetGame() {
-            state = [
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]
-            ];
-            currentPlayer = 1;
-            gameOver = false; // Remettre gameOver à false pour permettre aux joueurs de jouer à nouveau
-            drawBoard();
-        }
-
-        canvas.addEventListener('click', (e) => {
+        // Gère le clic de souris pour placer une pièce
+        function handleClick(event) {
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            handleMove(x, y);
-        });
+            const offsetX = event.clientX - rect.left;
+            const col = Math.floor(offsetX / GRID_SIZE);
 
-        drawBoard();
+            if (grid[0][col] === 0) {
+                // grid[row][col] = currentPlayer;
+                // currentPlayer = currentPlayer === 1 ? 2 : 1;
+                let line = ROWS - 1;
+                while (line >= 0 && grid[line][col] != 0) {
+                    line--;
+                }
+
+                grid[line][col] = currentPlayer;
+
+                grid = getNextMove(grid)
+
+                draw();
+
+                const winner = checkWinner();
+                if (winner !== 0) {
+                    announceWinner(winner);
+                }
+            }
+        }
+
+        // Annonce le gagnant
+        function announceWinner(winner) {
+            const message = winner === 1 ? "Joueur 1 a gagné !" : "Joueur 2 a gagné !";
+            alert(message);
+            // Vous pouvez également utiliser une boîte de dialogue personnalisée ou un élément HTML pour afficher le message d'annonce.
+        }
+
+        // Vérifie s'il y a un gagnant
+        function checkWinner() {
+            // Vérification horizontale
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col <= COLS - 4; col++) {
+                    const player = grid[row][col];
+                    if (player !== 0 &&
+                        grid[row][col + 1] === player &&
+                        grid[row][col + 2] === player &&
+                        grid[row][col + 3] === player) {
+                        return player; // On a trouvé un gagnant, on retourne le numéro du joueur
+                    }
+                }
+            }
+
+            // Vérification verticale
+            for (let row = 0; row <= ROWS - 4; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const player = grid[row][col];
+                    if (player !== 0 &&
+                        grid[row + 1][col] === player &&
+                        grid[row + 2][col] === player &&
+                        grid[row + 3][col] === player) {
+                        return player; // On a trouvé un gagnant, on retourne le numéro du joueur
+                    }
+                }
+            }
+
+            // Vérification diagonale (ascendante: /)
+            for (let row = 3; row < ROWS; row++) {
+                for (let col = 0; col <= COLS - 4; col++) {
+                    const player = grid[row][col];
+                    if (player !== 0 &&
+                        grid[row - 1][col + 1] === player &&
+                        grid[row - 2][col + 2] === player &&
+                        grid[row - 3][col + 3] === player) {
+                        return player; // On a trouvé un gagnant, on retourne le numéro du joueur
+                    }
+                }
+            }
+
+            // Vérification diagonale (descendante: \)
+            for (let row = 0; row <= ROWS - 4; row++) {
+                for (let col = 0; col <= COLS - 4; col++) {
+                    const player = grid[row][col];
+                    if (player !== 0 &&
+                        grid[row + 1][col + 1] === player &&
+                        grid[row + 2][col + 2] === player &&
+                        grid[row + 3][col + 3] === player) {
+                        return player; // On a trouvé un gagnant, on retourne le numéro du joueur
+                    }
+                }
+            }
+
+            return 0; // Aucun gagnant trouvé
+        }
+
+
+        // Initialiser le jeu
+        function initGame() {
+            initializeGrid();
+            draw();
+            canvas.addEventListener("click", handleClick);
+        }
+
+        initGame();
     </script>
 </body>
 
