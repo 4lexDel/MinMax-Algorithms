@@ -12,13 +12,14 @@ class MinMax {
      * @param {method} generateChildrenFunc 
      * @param {method} isGameOverFunc 
      */
-    constructor(implementation) {
+    constructor(implementation, pruningActive = true) {
         Interface.checkImplements(implementation, MinMax.MinMaxInterface);
         this.implementation = implementation;
 
+        this.pruningActive = pruningActive;
+
         this.nbNodeEvaluate = 0;
         this.nbPrunning = 0;
-        this.pruningActive = true;
 
         // Table de transposition (un objet Map en JavaScript)
         this.transpositionTable = new Map();
@@ -27,7 +28,10 @@ class MinMax {
     execute(state, depth) {
         this.depthMax = depth;
 
+        console.time('tempsExecution');
         let result = this.minMax(state, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false);
+        console.timeEnd('tempsExecution');
+
         console.log('Nb node explore : ' + this.nbNodeEvaluate);
         console.log('Nb pruning : ' + this.nbPrunning);
         console.log('Final evaluation : ' + result.evaluation);

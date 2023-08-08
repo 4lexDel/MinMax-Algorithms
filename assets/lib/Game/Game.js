@@ -31,8 +31,8 @@ class Game extends GameBase { //A renommer ?
             [1, 0, 0, 0, 2]
         ];
 
-        console.log("EVA TEST : " + this.ai.algo.implementation.evaluateState(gridTest, false));
-        console.log(this.ai.algo.implementation.generateChildren(gridTest2, false));
+        // console.log("EVA TEST : " + this.ai.algo.implementation.evaluateState(gridTest, false));
+        // console.log(this.ai.algo.implementation.generateChildren(gridTest2, false));
 
         /*--------------------------------*/
 
@@ -147,10 +147,10 @@ class Game extends GameBase { //A renommer ?
 
                 //MOVE------------------------------------------
 
-                console.log("BOBAIL PLAYER : " + this.game.playerToPlay);
+                // console.log("BOBAIL PLAYER : " + this.game.playerToPlay);
                 let result = this.game.movePiece(this.x1, this.y1, this.x2, this.y2);
-                console.log("move possible ? " + result);
-                console.log("BOBAIL PLAYER : " + this.game.playerToPlay);
+                // console.log("move possible ? " + result);
+                // console.log("BOBAIL PLAYER : " + this.game.playerToPlay);
 
                 if (result && this.game.playerToPlay == 2) { //Move effectué !
                     this.mapPlayer.grid = this.game.grid;

@@ -20,6 +20,12 @@ class BobailImplementation {
             childrenState = childrenState.concat(newPieceNextMoves);
         });
 
+        childrenState.sort((childA, childB) => {
+            if (maximizingPlayer) return this.evaluateState(childB, true) - this.evaluateState(childA, true);
+
+            return this.evaluateState(childA, true) - this.evaluateState(childB, true);
+        });
+
         return childrenState;
     }
 
@@ -103,7 +109,6 @@ class BobailImplementation {
 
         return newPieceStates;
     }
-
 
     getPieceDestinationByDirection(x0, y0, dx, dy, grid) { //return (x destination ; y destination) or false
         if ((Math.abs(dx) == 1 && Math.abs(dy) == 1) || ((Math.abs(dx) == 1 && dy == 0) || (dx == 0 && Math.abs(dy) == 1))) { //Diago ou droit

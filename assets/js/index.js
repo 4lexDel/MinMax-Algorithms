@@ -7,7 +7,7 @@
 let implementation = new MorpionImplementation();
 
 
-algo = new MinMax(implementation);
+algo = new MinMax(implementation, false);
 // let result = algo.execute(state);
 
 // console.log(result.state);
