@@ -72,7 +72,7 @@ class MinMax {
             const children = this.implementation.generateChildren(state, true);
             for (const childState of children) {
                 const evalChild = this.minMax(childState, depth - 1, alpha, beta, false);
-                if (evalChild > maxEval) {
+                if (this.randomChoice([evalChild > maxEval, evalChild >= maxEval])) {
                     maxEval = evalChild;
                     bestChild = childState;
                 }
@@ -94,7 +94,7 @@ class MinMax {
             const children = this.implementation.generateChildren(state, false);
             for (const childState of children) {
                 const evalChild = this.minMax(childState, depth - 1, alpha, beta, true);
-                if (evalChild < minEval) {
+                if (this.randomChoice([evalChild < minEval, evalChild <= minEval])) {
                     minEval = evalChild;
                     bestChild = childState;
                 }
@@ -115,6 +115,10 @@ class MinMax {
     pruningAction(depth) {
         this.nbPrunning++;
     }
+
+    randomChoice(tab){
+			return tab[Math.round(Math.random() * (tab.length-1))]
+		}
 }
 
 
